@@ -1,10 +1,30 @@
+/* ============================================
+   Esquema de cores — RM 566296 — Gabriella Serni Ponzetta
+   Primary: #991B1B | Secondary: #F87171
+   Table Background: #450A0A | Text: #FEF2F2
+   Accent: #FACC15 | Radius: 8px
+   ============================================ */
+
 :root {
-  --color-primary: #991B1B;
-  --color-secondary: #F87171;
-  --color-table-bg: #450A0A;
-  --color-text: #FEF2F2;
-  --color-accent: #FACC15;
+  --color-primary: #991b1b;
+  --color-secondary: #f87171;
+  --color-table-bg: #450a0a;
+  --color-text: #fef2f2;
+  --color-accent: #facc15;
   --radius: 8px;
+
+  --color-bg: #1a0505;
+}
+
+/* O tema claro/escuro troca apenas o fundo da página.
+   As cores da marca (primary, secondary, table, accent) do RM 566296
+   permanecem fixas conforme a tabela da Etapa 1. */
+.theme-light {
+  --color-bg: #fce8e8;
+}
+
+.theme-dark {
+  --color-bg: #1a0505;
 }
 
 * {
@@ -13,33 +33,8 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-table-bg);
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  background-color: var(--color-bg);
   color: var(--color-text);
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-}
-
-.app {
-  text-align: center;
-  padding: 48px 64px;
-  background: var(--color-primary);
-  border: 2px solid var(--color-secondary);
-  border-radius: var(--radius);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-.app h1 {
-  margin: 0 0 12px;
-  font-size: 3rem;
-  color: var(--color-accent);
-  letter-spacing: -1px;
-}
-
-.app p {
-  margin: 0;
-  color: var(--color-text);
-  font-size: 1.1rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
