@@ -1,116 +1,173 @@
-import { useState } from "react";
-import Header from "./components/Header";
-import GameTable from "./components/GameTable";
-import ScoreBoard from "./components/ScoreBoard";
-import Button from "./components/Button";
-import { shuffledDeck, handTotal } from "./data/deck";
-import "./App.css";
+import { useCallback, useEffect, useState } from 'react'
+import Header from './components/Header'
+import GameTable from './components/GameTable'
+import ScoreBoard from './components/ScoreBoard'
+import Button from './components/Button'
+import { drawRandomCards, calculateHandScore } from './data/deck'
+import './styles/App.css'
 
-const GOAL = 21; // meta do BlackJack (RM 566296)
+const TARGET_SCORE = 21 // meta de pontos (RM 566296 - Gabriella)
+const DEALER_STOP_SCORE = 17 // dealer compra carta enquanto tiver menos que isso
 
-function newRound() {
-  const deck = shuffledDeck();
-  return {
-    deck,
-    playerCards: [deck[0], deck[1]],
-    dealerCards: [deck[2], deck[3]],
-    nextCardIndex: 4,
-    status: "playing", // "playing" | "playerBust" | "dealerBust" | "playerWin" | "dealerWin" | "push"
-  };
+// Fases da rodada:
+// 'player-turn' -> jogador pode comprar carta (Hit) ou parar (Stand)
+// 'dealer-turn' -> dealer compra cartas automaticamente até 17+
+// 'round-over'  -> rodada encerrada, mostra o resultado
+function dealInitialHands() {
+  const dealerHand = drawRandomCards(2)
+  const playerHand = drawRandomCards(2, dealerHand)
+  return { dealerHand, playerHand }
 }
 
 function App() {
-  const [round, setRound] = useState(newRound());
-  const [isLightTheme, setIsLightTheme] = useState(false);
+  const [{ dealerHand, playerHand }, setHands] = useState(dealInitialHands)
+  const [phase, setPhase] = useState('player-turn')
 
-  const playerScore = handTotal(round.playerCards);
-  const dealerScore = handTotal(round.dealerCards);
-  const isRoundOver = round.status !== "playing";
+  const playerScore = calculateHandScore(playerHand)
+  const dealerScore = calculateHandScore(dealerHand)
 
-  function drawCard(cards, deck, nextCardIndex) {
-    const card = deck[nextCardIndex];
-    return { cards: [...cards, card], nextCardIndex: nextCardIndex + 1 };
-  }
+  // Comprar carta (Hit)
+  const handleHit = useCallback(() => {
+    if (phase !== 'player-turn') return
 
-  function handleHit() {
-    if (isRoundOver) return;
-    const { cards, nextCardIndex } = drawCard(round.playerCards, round.deck, round.nextCardIndex);
-    const total = handTotal(cards);
+    setHands((current) => {
+      const [newCard] = drawRandomCards(
+        1,
+        [...current.dealerHand, ...current.playerHand]
+      )
 
-    setRound({
-      ...round,
-      playerCards: cards,
-      nextCardIndex,
-      status: total > GOAL ? "playerBust" : "playing",
-    });
-  }
+      return {
+        ...current,
+        playerHand: [...current.playerHand, newCard]
+      }
+    })
+  }, [phase])
 
-  function handleStand() {
-    if (isRoundOver) return;
+  // Parar (Stand)
+  const handleStand = useCallback(() => {
+    if (phase !== 'player-turn') return
+    setPhase('dealer-turn')
+  }, [phase])
 
-    let dealerCards = [...round.dealerCards];
-    let deck = round.deck;
-    let nextCardIndex = round.nextCardIndex;
+  // Nova rodada
+  const handleNewRound = useCallback(() => {
+    setHands(dealInitialHands())
+    setPhase('player-turn')
+  }, [])
 
-    // dealer compra até 17 (regra clássica)
-    while (handTotal(dealerCards) < 17) {
-      dealerCards = [...dealerCards, deck[nextCardIndex]];
-      nextCardIndex += 1;
+  // Se o jogador estourar 21
+  useEffect(() => {
+    if (phase === 'player-turn' && playerScore > TARGET_SCORE) {
+      setPhase('round-over')
+    }
+  }, [phase, playerScore])
+
+  // Vez do dealer
+  useEffect(() => {
+    if (phase !== 'dealer-turn') return
+
+    let currentDealerHand = dealerHand
+
+    while (calculateHandScore(currentDealerHand) < DEALER_STOP_SCORE) {
+      const [newCard] = drawRandomCards(
+        1,
+        [...currentDealerHand, ...playerHand]
+      )
+
+      currentDealerHand = [...currentDealerHand, newCard]
     }
 
-    const finalPlayer = handTotal(round.playerCards);
-    const finalDealer = handTotal(dealerCards);
+    setHands({
+      dealerHand: currentDealerHand,
+      playerHand
+    })
 
-    let status;
-    if (finalDealer > GOAL) status = "dealerBust";
-    else if (finalPlayer > finalDealer) status = "playerWin";
-    else if (finalPlayer < finalDealer) status = "dealerWin";
-    else status = "push";
+    setPhase('round-over')
+  }, [phase, dealerHand, playerHand])
 
-    setRound({ ...round, dealerCards, nextCardIndex, status });
+  // Texto que aparece acima dos botões
+  function getStatus() {
+    if (phase === 'player-turn') {
+      return 'Sua vez: escolha Hit, Stand ou reinicie a rodada'
+    }
+
+    if (phase === 'dealer-turn') {
+      return 'Dealer jogando...'
+    }
+
+    if (playerScore > TARGET_SCORE) {
+      return 'Você estourou! O dealer venceu.'
+    }
+
+    if (dealerScore > TARGET_SCORE) {
+      return 'Dealer estourou! Você venceu.'
+    }
+
+    if (playerScore === dealerScore) {
+      return 'Empate!'
+    }
+
+    return playerScore > dealerScore
+      ? 'Você venceu a rodada!'
+      : 'Dealer venceu a rodada.'
   }
-
-  function handleNewRound() {
-    setRound(newRound());
-  }
-
-  const statusMessages = {
-    playing: `Sua vez — Hit, Stand ou vire a rodada. Meta: ${GOAL} pontos.`,
-    playerBust: "Você estourou! O dealer venceu.",
-    dealerBust: "Dealer estourou! Você venceu.",
-    playerWin: "Você venceu esta rodada!",
-    dealerWin: "Dealer venceu esta rodada.",
-    push: "Empate!",
-  };
 
   return (
-    <div className={`app ${isLightTheme ? "app--light" : ""}`}>
+    <div className="app theme-dark">
       <div className="app__container">
+
         <Header
-          status={statusMessages[round.status]}
-          onToggleTheme={() => setIsLightTheme((v) => !v)}
-          isLightTheme={isLightTheme}
+          playerName="Gabriella Serni"
+          target={TARGET_SCORE}
         />
 
         <ScoreBoard
           playerScore={playerScore}
-          dealerScore={isRoundOver ? dealerScore : null}
+          dealerScore={dealerScore}
         />
 
         <GameTable
-          dealerCards={round.dealerCards}
-          playerCards={round.playerCards}
-          hideDealerFirstCard={!isRoundOver}
+          dealerCards={dealerHand}
+          playerCards={playerHand}
+          hideDealerFirstCard={phase === 'player-turn'}
         />
 
-        <div className="app__actions">
-          <Button label="Hit" variant="primary" onClick={handleHit} disabled={isRoundOver} />
-          <Button label="Stand" variant="secondary" onClick={handleStand} disabled={isRoundOver} />
-          <Button label="Nova rodada" variant="accent" onClick={handleNewRound} />
+        {/* TEXTO ACIMA DOS BOTÕES */}
+        <div className="game-status">
+          {getStatus()}
         </div>
+
+        {/* BOTÕES */}
+        <div className="app__actions">
+
+          <Button
+            variant="primary"
+            onClick={handleHit}
+            disabled={phase !== 'player-turn'}
+          >
+            Hit
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={handleStand}
+            disabled={phase !== 'player-turn'}
+          >
+            Stand
+          </Button>
+
+          <Button
+            variant="accent"
+            onClick={handleNewRound}
+          >
+            Nova rodada
+          </Button>
+
+        </div>
+
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

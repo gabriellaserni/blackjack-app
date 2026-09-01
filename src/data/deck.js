@@ -1,5 +1,5 @@
-// Gera um baralho completo no mesmo formato do mock (1).json que veio da API
-// https://deckofcardsapi.com — cada carta: { code, image, images, value, suit }
+// Gera um baralho completo no mesmo formato do mock da API
+// https://deckofcardsapi.com
 
 const SUITS = [
   { key: "S", name: "SPADES" },
@@ -18,7 +18,7 @@ const VALUES = [
   { key: "7", name: "7" },
   { key: "8", name: "8" },
   { key: "9", name: "9" },
-  { key: "0", name: "10" }, // a API usa "0" pro código do 10
+  { key: "0", name: "10" },
   { key: "J", name: "JACK" },
   { key: "Q", name: "QUEEN" },
   { key: "K", name: "KING" },
@@ -26,9 +26,11 @@ const VALUES = [
 
 function buildDeck() {
   const deck = [];
+
   SUITS.forEach((suit) => {
     VALUES.forEach((value) => {
       const code = `${value.key}${suit.key}`;
+
       deck.push({
         code,
         image: `https://deckofcardsapi.com/static/img/${code}.png`,
@@ -41,32 +43,63 @@ function buildDeck() {
       });
     });
   });
+
   return deck;
 }
 
+// Embaralha o baralho
 export function shuffledDeck() {
   const deck = buildDeck();
+
   for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
+
   return deck;
 }
 
-// Converte o "value" da carta (ex: "QUEEN", "10", "ACE") em pontos do Blackjack
+// Compra cartas aleatórias
+export function drawRandomCards(quantity, excludedCards = []) {
+  const excludedCodes = new Set(
+    excludedCards.map((card) => card.code)
+  );
+
+  const availableCards = shuffledDeck().filter(
+    (card) => !excludedCodes.has(card.code)
+  );
+
+  return availableCards.slice(0, quantity);
+}
+
+// Converte o valor da carta em pontos
 export function cardPoints(value) {
   if (value === "ACE") return 11;
-  if (["JACK", "QUEEN", "KING"].includes(value)) return 10;
+
+  if (["JACK", "QUEEN", "KING"].includes(value)) {
+    return 10;
+  }
+
   return Number(value);
 }
 
-// Soma a mão tratando o Ás como 1 quando estourar 21
-export function handTotal(cards) {
-  let total = cards.reduce((sum, c) => sum + cardPoints(c.value), 0);
-  let aces = cards.filter((c) => c.value === "ACE").length;
+// Calcula a pontuação da mão no Blackjack
+export function calculateHandScore(cards) {
+  let total = cards.reduce(
+    (sum, card) => sum + cardPoints(card.value),
+    0
+  );
+
+  let aces = cards.filter(
+    (card) => card.value === "ACE"
+  ).length;
+
+  // Se passou de 21, transforma Ás de 11 em 1
   while (total > 21 && aces > 0) {
     total -= 10;
-    aces -= 1;
+    aces--;
   }
+
   return total;
 }

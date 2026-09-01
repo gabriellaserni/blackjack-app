@@ -1,6 +1,11 @@
 import "./Button.css";
 
-function Button({ label, onClick, variant = "primary", disabled = false }) {
+function Button({
+  children,
+  onClick,
+  variant = "primary",
+  disabled = false
+}) {
   return (
     <button
       className={`btn btn--${variant}`}
@@ -8,7 +13,7 @@ function Button({ label, onClick, variant = "primary", disabled = false }) {
       disabled={disabled}
       type="button"
     >
-      {label}
+      {children}
     </button>
   );
 }

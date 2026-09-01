@@ -16,17 +16,6 @@
   --color-bg: #1a0505;
 }
 
-/* O tema claro/escuro troca apenas o fundo da página.
-   As cores da marca (primary, secondary, table, accent) do RM 566296
-   permanecem fixas conforme a tabela da Etapa 1. */
-.theme-light {
-  --color-bg: #fce8e8;
-}
-
-.theme-dark {
-  --color-bg: #1a0505;
-}
-
 * {
   box-sizing: border-box;
 }

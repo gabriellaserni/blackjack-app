@@ -1,23 +1,27 @@
-import "./Header.css";
+import './Header.css'
 
-function Header({ status, onToggleTheme, isLightTheme }) {
+/**
+ * Header — cabeçalho do jogo.
+ * Props:
+ *  - playerName: nome exibido no topo
+ *  - target: pontuação alvo do Blackjack (RM da Gabriella = 21)
+ */
+function Header({ playerName, target }) {
   return (
     <header className="header">
-      <div className="header__top">
-        <div className="header__title-group">
-          <span className="header__badge">21</span>
-          <h1 className="header__title">BLACKJACK</h1>
-        </div>
-        <button className="header__theme-btn" onClick={onToggleTheme} type="button">
-          {isLightTheme ? "Tema escuro" : "Tema claro"}
-        </button>
+      <div className="header__player">Jogador: {playerName}</div>
+
+      <div className="header__title-row">
+        <span className="header__badge">{target}</span>
+        <h1 className="header__title">BLACKJACK</h1>
       </div>
-      <p className="header__author">
-        Gabriella Serni Ponzetta — RM 566296
+
+      <p className="header__subtitle">
+        Por Gabriella Serni Ponzetta · Objetivo da rodada: fazer{' '}
+        {target} pontos
       </p>
-      <p className="header__status">{status}</p>
     </header>
-  );
+  )
 }
 
-export default Header;
+export default Header
