@@ -1,0 +1,41 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 1.2rem;
+}
+
+.app__container {
+  width: 100%;
+  max-width: 480px;
+}
+
+.app__actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+
+/* Tema claro: mesma paleta, invertendo fundo/superfícies */
+.app--light {
+  background: #F8B4B4;
+  color: #450A0A;
+}
+
+.app--light .header__author,
+.app--light .header__status {
+  color: var(--color-table-bg);
+}
+
+.app--light .btn--secondary {
+  color: var(--color-table-bg);
+  border-color: var(--color-primary);
+}
+
+@media (max-width: 480px) {
+  .app__actions .btn {
+    flex: 1;
+  }
+}

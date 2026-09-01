@@ -30,6 +30,7 @@ O Blackjack, também conhecido como "21", é um jogo de cartas jogado entre o jo
 - Se o jogador fizer exatamente 21 pontos com as duas primeiras cartas (um Ás + uma carta de valor 10), tem um **Blackjack**, a melhor mão do jogo.
 - Vence quem ficar mais próximo de 21 sem estourar, comparando a mão do jogador com a do dealer.
 
+
 ## Aluno(a)
 
 - **Nome:** Gabriella Serni Ponzetta
