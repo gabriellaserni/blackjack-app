@@ -4,7 +4,6 @@ import GameTable from './components/GameTable'
 import ScoreBoard from './components/ScoreBoard'
 import Button from './components/Button'
 import { drawRandomCards, calculateHandScore } from './data/deck'
-import './styles/App.css'
 
 const TARGET_SCORE = 21 // meta de pontos (RM 566296 - Gabriella)
 const DEALER_STOP_SCORE = 17 // dealer compra carta enquanto tiver menos que isso
@@ -38,7 +37,7 @@ function App() {
 
       return {
         ...current,
-        playerHand: [...current.playerHand, newCard]
+        playerHand: [...current.playerHand, newCard],
       }
     })
   }, [phase])
@@ -79,7 +78,7 @@ function App() {
 
     setHands({
       dealerHand: currentDealerHand,
-      playerHand
+      playerHand,
     })
 
     setPhase('round-over')
@@ -113,8 +112,8 @@ function App() {
   }
 
   return (
-    <div className="app theme-dark">
-      <div className="app__container">
+    <div className="min-h-screen flex justify-center px-4 py-6 bg-[#1a0505] text-[#fef2f2]">
+      <div className="w-full max-w-[480px]">
 
         <Header
           playerName="Gabriella Serni"
@@ -133,12 +132,12 @@ function App() {
         />
 
         {/* TEXTO ACIMA DOS BOTÕES */}
-        <div className="game-status">
+        <div className="text-center my-4">
           {getStatus()}
         </div>
 
         {/* BOTÕES */}
-        <div className="app__actions">
+        <div className="flex gap-3 justify-center mt-2">
 
           <Button
             variant="primary"
