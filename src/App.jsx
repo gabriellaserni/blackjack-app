@@ -7,8 +7,6 @@ import { ThemeProvider } from './contexts/ThemeContext'
 
 function BlackjackGame() {
   const {
-    dealerHand,
-    playerHand,
     playerScore,
     dealerScore,
     phase,
@@ -53,16 +51,9 @@ function BlackjackGame() {
           target={TARGET_SCORE}
         />
 
-        <ScoreBoard
-          playerScore={playerScore}
-          dealerScore={dealerScore}
-        />
+        <ScoreBoard />
 
-        <GameTable
-          dealerCards={dealerHand}
-          playerCards={playerHand}
-          hideDealerFirstCard={phase === 'player-turn'}
-        />
+        <GameTable />
 
         <div className="text-center my-4">
           {getStatus()}
