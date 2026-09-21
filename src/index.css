@@ -1,9 +1,4 @@
-/* ============================================
-   Esquema de cores — RM 566296 — Gabriella Serni Ponzetta
-   Primary: #991B1B | Secondary: #F87171
-   Table Background: #450A0A | Text: #FEF2F2
-   Accent: #FACC15 | Radius: 8px
-   ============================================ */
+@import "tailwindcss";
 
 :root {
   --color-primary: #991b1b;
