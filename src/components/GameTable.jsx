@@ -2,7 +2,7 @@ import Card from "./Card";
 
 function GameTable({ dealerCards, playerCards, hideDealerFirstCard }) {
   return (
-    <div className="bg-[var(--color-table-bg)] p-4 rounded-[var(--radius)] mt-4">
+    <div className="bg-[var(--color-table-bg)] border-2 border-[var(--color-game-border)] p-4 rounded-[var(--radius)] mt-4 transition-colors duration-200">
       <section className="mb-6">
         <h3 className="text-center m-0 mb-3 text-sm font-bold tracking-wider">
           DEALER
