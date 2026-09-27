@@ -2,8 +2,15 @@ import Header from './components/Header'
 import GameTable from './components/GameTable'
 import ScoreBoard from './components/ScoreBoard'
 import Button from './components/Button'
+import ProtectedRoute from './components/ProtectedRoute'
+
 import { GameProvider, useGame } from './contexts/GameContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import NotFound from './pages/NotFound'
 
 function BlackjackGame() {
   const {
@@ -93,11 +100,41 @@ function BlackjackGame() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <GameProvider>
-        <BlackjackGame />
-      </GameProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider>
+        <GameProvider>
+
+          <Routes>
+
+            <Route
+              path="/"
+              element={<Home />}
+            />
+
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/game"
+              element={
+                <ProtectedRoute>
+                  <BlackjackGame />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
+
+          </Routes>
+
+        </GameProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   )
 }
 
