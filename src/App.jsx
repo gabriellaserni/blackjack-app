@@ -1,90 +1,21 @@
-import { useCallback, useEffect, useState } from 'react'
 import Header from './components/Header'
 import GameTable from './components/GameTable'
 import ScoreBoard from './components/ScoreBoard'
 import Button from './components/Button'
-import { drawRandomCards, calculateHandScore } from './data/deck'
+import { GameProvider, useGame } from './contexts/GameContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 
-const TARGET_SCORE = 21 // meta de pontos (RM 566296 - Gabriella)
-const DEALER_STOP_SCORE = 17 // dealer compra carta enquanto tiver menos que isso
+function BlackjackGame() {
+  const {
+    playerScore,
+    dealerScore,
+    phase,
+    handleHit,
+    handleStand,
+    handleNewRound,
+    TARGET_SCORE,
+  } = useGame()
 
-// Fases da rodada:
-// 'player-turn' -> jogador pode comprar carta (Hit) ou parar (Stand)
-// 'dealer-turn' -> dealer compra cartas automaticamente até 17+
-// 'round-over'  -> rodada encerrada, mostra o resultado
-function dealInitialHands() {
-  const dealerHand = drawRandomCards(2)
-  const playerHand = drawRandomCards(2, dealerHand)
-  return { dealerHand, playerHand }
-}
-
-function App() {
-  const [{ dealerHand, playerHand }, setHands] = useState(dealInitialHands)
-  const [phase, setPhase] = useState('player-turn')
-
-  const playerScore = calculateHandScore(playerHand)
-  const dealerScore = calculateHandScore(dealerHand)
-
-  // Comprar carta (Hit)
-  const handleHit = useCallback(() => {
-    if (phase !== 'player-turn') return
-
-    setHands((current) => {
-      const [newCard] = drawRandomCards(
-        1,
-        [...current.dealerHand, ...current.playerHand]
-      )
-
-      return {
-        ...current,
-        playerHand: [...current.playerHand, newCard],
-      }
-    })
-  }, [phase])
-
-  // Parar (Stand)
-  const handleStand = useCallback(() => {
-    if (phase !== 'player-turn') return
-    setPhase('dealer-turn')
-  }, [phase])
-
-  // Nova rodada
-  const handleNewRound = useCallback(() => {
-    setHands(dealInitialHands())
-    setPhase('player-turn')
-  }, [])
-
-  // Se o jogador estourar 21
-  useEffect(() => {
-    if (phase === 'player-turn' && playerScore > TARGET_SCORE) {
-      setPhase('round-over')
-    }
-  }, [phase, playerScore])
-
-  // Vez do dealer
-  useEffect(() => {
-    if (phase !== 'dealer-turn') return
-
-    let currentDealerHand = dealerHand
-
-    while (calculateHandScore(currentDealerHand) < DEALER_STOP_SCORE) {
-      const [newCard] = drawRandomCards(
-        1,
-        [...currentDealerHand, ...playerHand]
-      )
-
-      currentDealerHand = [...currentDealerHand, newCard]
-    }
-
-    setHands({
-      dealerHand: currentDealerHand,
-      playerHand,
-    })
-
-    setPhase('round-over')
-  }, [phase, dealerHand, playerHand])
-
-  // Texto que aparece acima dos botões
   function getStatus() {
     if (phase === 'player-turn') {
       return 'Sua vez: escolha Hit, Stand ou reinicie a rodada'
@@ -112,7 +43,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex justify-center px-4 py-6 bg-[#1a0505] text-[#fef2f2]">
+    <div className="min-h-screen flex justify-center px-4 py-6 bg-[var(--color-bg)] text-[var(--color-text)] transition-colors duration-200">
       <div className="w-full max-w-[480px]">
 
         <Header
@@ -120,23 +51,14 @@ function App() {
           target={TARGET_SCORE}
         />
 
-        <ScoreBoard
-          playerScore={playerScore}
-          dealerScore={dealerScore}
-        />
+        <ScoreBoard />
 
-        <GameTable
-          dealerCards={dealerHand}
-          playerCards={playerHand}
-          hideDealerFirstCard={phase === 'player-turn'}
-        />
+        <GameTable />
 
-        {/* TEXTO ACIMA DOS BOTÕES */}
         <div className="text-center my-4">
           {getStatus()}
         </div>
 
-        {/* BOTÕES */}
         <div className="flex gap-3 justify-center mt-2">
 
           <Button
@@ -166,6 +88,16 @@ function App() {
 
       </div>
     </div>
+  )
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <GameProvider>
+        <BlackjackGame />
+      </GameProvider>
+    </ThemeProvider>
   )
 }
 

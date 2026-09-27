@@ -7,8 +7,31 @@
   --color-text: #fef2f2;
   --color-accent: #facc15;
   --radius: 8px;
+  --color-game-border: #7f1d1d;
 
   --color-bg: #1a0505;
+}
+
+/* Tema claro */
+:root:not(.dark) {
+  --color-primary: #fecaca;
+  --color-secondary: #fca5a5;
+  --color-table-bg: #f9b5c0;
+  --color-text: #450a0a;
+  --color-accent: #991b1b;
+  --color-bg: #fff7f7;
+  --color-game-border: #f9a8b8;
+}
+
+/* Tema escuro */
+:root.dark {
+  --color-primary: #991b1b;
+  --color-secondary: #f87171;
+  --color-table-bg: #450a0a;
+  --color-text: #fef2f2;
+  --color-accent: #facc15;
+  --color-bg: #1a0505;
+  --color-game-border: #7f1d1d;
 }
 
 * {
