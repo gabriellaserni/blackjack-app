@@ -31,6 +31,17 @@ O Blackjack, também conhecido como "21", é um jogo de cartas jogado entre o jo
 - Vence quem ficar mais próximo de 21 sem estourar, comparando a mão do jogador com a do dealer.
 
 
+## Credenciais para teste
+
+Para acessar a aplicação durante a avaliação, utilize as credenciais de demonstração:
+
+- **Usuário:** `gabriella`
+- **Senha:** `1234`
+
+Após entrar, o botão **Sair**, no cabeçalho do jogo, encerra a sessão de demonstração e redireciona para a tela de login.
+
+> **Importante:** essas credenciais fixas e o armazenamento de autenticação no navegador são apenas para fins didáticos. Não representam uma implementação segura para uso em produção.
+
 ## Aluno(a)
 
 - **Nome:** Gabriella Serni Ponzetta

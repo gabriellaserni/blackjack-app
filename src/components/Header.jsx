@@ -6,7 +6,7 @@ import { useTheme } from '../contexts/ThemeContext'
  *  - playerName: nome exibido no topo
  *  - target: pontuação alvo do Blackjack
  */
-function Header({ playerName, target }) {
+function Header({ playerName, target, onLogout }) {
   const { darkMode, toggleTheme } = useTheme()
 
   return (
@@ -17,15 +17,25 @@ function Header({ playerName, target }) {
           Jogador: {playerName}
         </div>
 
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="bg-[var(--color-accent)] text-[var(--color-table-bg)] font-bold rounded-full w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
-          aria-label={darkMode ? 'Ativar tema claro' : 'Ativar tema escuro'}
-          title={darkMode ? 'Tema claro' : 'Tema escuro'}
-        >
-          {darkMode ? '☀️' : '🌙'}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onLogout}
+            className="bg-[var(--color-accent)] text-[var(--color-table-bg)] font-bold px-3 py-2 rounded-full text-sm cursor-pointer transition-transform hover:scale-105"
+          >
+            Sair
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="bg-[var(--color-accent)] text-[var(--color-table-bg)] font-bold rounded-full w-9 h-9 flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
+            aria-label={darkMode ? 'Ativar tema claro' : 'Ativar tema escuro'}
+            title={darkMode ? 'Tema claro' : 'Tema escuro'}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
       </div>
 
       <div className="flex items-center gap-3 flex-wrap mt-2">

@@ -1,9 +1,17 @@
+
 import Header from './components/Header'
 import GameTable from './components/GameTable'
 import ScoreBoard from './components/ScoreBoard'
 import Button from './components/Button'
+import ProtectedRoute from './components/ProtectedRoute'
+
 import { GameProvider, useGame } from './contexts/GameContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Login'
+import NotFound from './pages/NotFound'
 
 function BlackjackGame() {
   const {
@@ -15,6 +23,13 @@ function BlackjackGame() {
     handleNewRound,
     TARGET_SCORE,
   } = useGame()
+
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    localStorage.removeItem('isAuthenticated')
+    navigate('/login', { replace: true })
+  }
 
   function getStatus() {
     if (phase === 'player-turn') {
@@ -49,6 +64,7 @@ function BlackjackGame() {
         <Header
           playerName="Gabriella Serni"
           target={TARGET_SCORE}
+          onLogout={handleLogout}
         />
 
         <ScoreBoard />
@@ -60,7 +76,6 @@ function BlackjackGame() {
         </div>
 
         <div className="flex gap-3 justify-center mt-2">
-
           <Button
             variant="primary"
             onClick={handleHit}
@@ -83,7 +98,6 @@ function BlackjackGame() {
           >
             Nova rodada
           </Button>
-
         </div>
 
       </div>
@@ -93,11 +107,37 @@ function BlackjackGame() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <GameProvider>
-        <BlackjackGame />
-      </GameProvider>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider>
+        <GameProvider>
+          <Routes>
+            <Route
+              path="/"
+              element={<Home />}
+            />
+
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/game"
+              element={
+                <ProtectedRoute>
+                  <BlackjackGame />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
+          </Routes>
+        </GameProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   )
 }
 
