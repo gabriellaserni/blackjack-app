@@ -1,84 +1,176 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { drawRandomCards, calculateHandScore } from '../data/deck'
+
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from 'react'
+
+import { calculateHandScore } from '../data/deck'
+import {
+    createDeck,
+    shuffleDeck,
+    drawCards,
+} from '../services/deckApi'
 
 const GameContext = createContext()
 
 const TARGET_SCORE = 21
 const DEALER_STOP_SCORE = 17
 
-function dealInitialHands() {
-    const dealerHand = drawRandomCards(2)
-    const playerHand = drawRandomCards(2, dealerHand)
-
-    return { dealerHand, playerHand }
+function splitInitialCards(cards) {
+    return {
+        dealerHand: cards.slice(0, 2),
+        playerHand: cards.slice(2, 4),
+    }
 }
 
 export function GameProvider({ children }) {
-    const [{ dealerHand, playerHand }, setHands] = useState(dealInitialHands)
-    const [phase, setPhase] = useState('player-turn')
+    const [hands, setHands] = useState({
+        dealerHand: [],
+        playerHand: [],
+    })
+
+    const [deckId, setDeckId] = useState(null)
+    const [phase, setPhase] = useState('loading')
+    const [error, setError] = useState('')
+
+    const { dealerHand, playerHand } = hands
 
     const playerScore = calculateHandScore(playerHand)
     const dealerScore = calculateHandScore(dealerHand)
 
-    // Comprar carta
-    const handleHit = useCallback(() => {
-        if (phase !== 'player-turn') return
+    // Cria o baralho, embaralha e distribui as cartas iniciais.
+    useEffect(() => {
+        let active = true
 
-        setHands((current) => {
-            const [newCard] = drawRandomCards(
-                1,
-                [...current.dealerHand, ...current.playerHand]
-            )
+        async function startGame() {
+            try {
+                setError('')
 
-            return {
-                ...current,
-                playerHand: [...current.playerHand, newCard],
+                const newDeckId = await createDeck()
+                await shuffleDeck(newDeckId)
+
+                const cards = await drawCards(newDeckId, 4)
+
+                if (!active) return
+
+                setDeckId(newDeckId)
+                setHands(splitInitialCards(cards))
+                setPhase('player-turn')
+            } catch (err) {
+                if (!active) return
+
+                setError(err.message || 'Erro ao iniciar o jogo.')
+                setPhase('error')
             }
-        })
-    }, [phase])
+        }
 
-    // Parar
+        startGame()
+
+        return () => {
+            active = false
+        }
+    }, [])
+
+    // Compra uma carta para o jogador.
+    const handleHit = useCallback(async () => {
+        if (phase !== 'player-turn' || !deckId) return
+
+        setPhase('drawing-player')
+        setError('')
+
+        try {
+            const cards = await drawCards(deckId, 1)
+            const nextPlayerHand = [...playerHand, ...cards]
+
+            setHands((current) => ({
+                ...current,
+                playerHand: nextPlayerHand,
+            }))
+
+            if (calculateHandScore(nextPlayerHand) > TARGET_SCORE) {
+                setPhase('round-over')
+            } else {
+                setPhase('player-turn')
+            }
+        } catch (err) {
+            setError(err.message || 'Erro ao comprar uma carta.')
+            setPhase('error')
+        }
+    }, [phase, deckId, playerHand])
+
+    // O jogador encerra sua vez.
     const handleStand = useCallback(() => {
         if (phase !== 'player-turn') return
 
         setPhase('dealer-turn')
     }, [phase])
 
-    // Nova rodada
-    const handleNewRound = useCallback(() => {
-        setHands(dealInitialHands())
-        setPhase('player-turn')
-    }, [])
+    // Inicia uma nova rodada com cartas novas do mesmo baralho.
+    const handleNewRound = useCallback(async () => {
+        if (!deckId) return
 
-    // Jogador estourou 21
-    useEffect(() => {
-        if (phase === 'player-turn' && playerScore > TARGET_SCORE) {
-            setPhase('round-over')
+        setPhase('loading')
+        setError('')
+
+        try {
+            // Reembaralha o baralho antes de distribuir a nova rodada.
+            await shuffleDeck(deckId)
+
+            const cards = await drawCards(deckId, 4)
+
+            setHands(splitInitialCards(cards))
+            setPhase('player-turn')
+        } catch (err) {
+            setError(err.message || 'Erro ao iniciar uma nova rodada.')
+            setPhase('error')
         }
-    }, [phase, playerScore])
+    }, [deckId])
 
-    // Vez do dealer
+    // O dealer compra até atingir pelo menos 17 pontos.
     useEffect(() => {
-        if (phase !== 'dealer-turn') return
+        if (phase !== 'dealer-turn' || !deckId) return
 
-        let currentDealerHand = dealerHand
+        let active = true
 
-        while (calculateHandScore(currentDealerHand) < DEALER_STOP_SCORE) {
-            const [newCard] = drawRandomCards(
-                1,
-                [...currentDealerHand, ...playerHand]
-            )
+        async function playDealer() {
+            try {
+                let currentDealerHand = dealerHand
 
-            currentDealerHand = [...currentDealerHand, newCard]
+                while (
+                    calculateHandScore(currentDealerHand) < DEALER_STOP_SCORE
+                ) {
+                    const cards = await drawCards(deckId, 1)
+
+                    if (!active) return
+
+                    currentDealerHand = [...currentDealerHand, ...cards]
+                }
+
+                if (!active) return
+
+                setHands((current) => ({
+                    ...current,
+                    dealerHand: currentDealerHand,
+                }))
+
+                setPhase('round-over')
+            } catch (err) {
+                if (!active) return
+
+                setError(err.message || 'Erro ao comprar cartas para o dealer.')
+                setPhase('error')
+            }
         }
 
-        setHands({
-            dealerHand: currentDealerHand,
-            playerHand,
-        })
+        playDealer()
 
-        setPhase('round-over')
-    }, [phase, dealerHand, playerHand])
+        return () => {
+            active = false
+        }
+    }, [phase, deckId, dealerHand])
 
     return (
         <GameContext.Provider
@@ -88,6 +180,7 @@ export function GameProvider({ children }) {
                 playerScore,
                 dealerScore,
                 phase,
+                error,
                 handleHit,
                 handleStand,
                 handleNewRound,

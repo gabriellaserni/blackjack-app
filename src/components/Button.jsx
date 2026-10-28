@@ -15,7 +15,7 @@ function Button({
       "bg-transparent text-[var(--color-text)] border-2 border-[var(--color-secondary)]",
 
     accent:
-      "bg-[var(--color-secondary)] text-[var(--color-table-bg)]",
+      "bg-[var(--color-accent)] text-[var(--color-table-bg)]",
   };
 
   return (
