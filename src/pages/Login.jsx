@@ -1,3 +1,4 @@
+
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,10 +11,18 @@ function Login() {
 
     function handleSubmit(event) {
         event.preventDefault()
+        setErro('')
 
-        if (usuario === 'gabriella' && senha === '1234') {
+        const senhaCorreta = import.meta.env.VITE_GAME_PASSWORD
+
+        if (!senhaCorreta) {
+            setErro('Senha de acesso não configurada.')
+            return
+        }
+
+        if (usuario === 'gabriella' && senha === senhaCorreta) {
             localStorage.setItem('isAuthenticated', 'true')
-            navigate('/game')
+            navigate('/game', { replace: true })
         } else {
             setErro('Usuário ou senha incorretos.')
         }
@@ -43,6 +52,7 @@ function Login() {
                             onChange={(event) => setUsuario(event.target.value)}
                             className="w-full px-3 py-2 rounded border text-black"
                             placeholder="Digite seu usuário"
+                            required
                         />
                     </div>
 
@@ -57,6 +67,7 @@ function Login() {
                             onChange={(event) => setSenha(event.target.value)}
                             className="w-full px-3 py-2 rounded border text-black"
                             placeholder="Digite sua senha"
+                            required
                         />
                     </div>
 
