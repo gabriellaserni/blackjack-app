@@ -3,7 +3,7 @@
 
 ## Aplicação
 
-Acesse o jogo online: [Blackjack Lounge — Vercel](https://blackjack-app-hg1j-5qltgain7-ads-679e.vercel.app/)
+Acesse o jogo online: https://blackjack-app-weld.vercel.app/
 
 ## Objetivo do Projeto
 
