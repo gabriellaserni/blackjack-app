@@ -1,4 +1,9 @@
+
 # Blackjack Lounge
+
+## Aplicação
+
+Acesse o jogo online: [Blackjack Lounge — Vercel](https://blackjack-app-hg1j-5qltgain7-ads-679e.vercel.app/)
 
 ## Objetivo do Projeto
 
@@ -29,7 +34,6 @@ O Blackjack, também conhecido como "21", é um jogo de cartas jogado entre o jo
 - Se o jogador ultrapassar 21 pontos, perde automaticamente.
 - Se o jogador fizer exatamente 21 pontos com as duas primeiras cartas (um Ás + uma carta de valor 10), tem um **Blackjack**, a melhor mão do jogo.
 - Vence quem ficar mais próximo de 21 sem estourar, comparando a mão do jogador com a do dealer.
-
 
 ## Credenciais para teste
 

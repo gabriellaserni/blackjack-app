@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -38,7 +37,7 @@ function Login() {
             <div className="w-full max-w-md">
 
                 <h1 className="text-3xl font-bold text-center mb-6">
-                    Login
+                    Conecte-se
                 </h1>
 
                 <form
@@ -55,7 +54,7 @@ function Login() {
                             type="text"
                             value={usuario}
                             onChange={(event) => setUsuario(event.target.value)}
-                            className="w-full px-3 py-2 rounded border text-black"
+                            className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-black placeholder:text-gray-500"
                             placeholder="Digite seu usuário"
                             required
                         />
@@ -70,7 +69,7 @@ function Login() {
                             type="password"
                             value={senha}
                             onChange={(event) => setSenha(event.target.value)}
-                            className="w-full px-3 py-2 rounded border text-black"
+                            className="w-full px-3 py-2 rounded border border-gray-300 bg-white text-black placeholder:text-gray-500"
                             placeholder="Digite sua senha"
                             required
                         />
