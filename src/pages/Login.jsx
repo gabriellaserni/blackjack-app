@@ -13,14 +13,19 @@ function Login() {
         event.preventDefault()
         setErro('')
 
-        const senhaCorreta = import.meta.env.VITE_GAME_PASSWORD
+        // Senha configurada nas variáveis de ambiente da Vercel
+        const senhaCorreta = import.meta.env.VITE_GAME_PASSWORD_BLACKJACK
 
         if (!senhaCorreta) {
             setErro('Senha de acesso não configurada.')
             return
         }
 
-        if (usuario === 'gabriella' && senha === senhaCorreta) {
+        // Validação do usuário e da senha
+        if (
+            usuario.trim().toLowerCase() === 'gabriella' &&
+            senha === senhaCorreta
+        ) {
             localStorage.setItem('isAuthenticated', 'true')
             navigate('/game', { replace: true })
         } else {
