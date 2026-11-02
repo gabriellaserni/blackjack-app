@@ -52,7 +52,7 @@ function BlackjackGame() {
     }
 
     if (phase === 'player-turn') {
-      return 'Sua vez: escolha Hit, Stand ou reinicie a rodada'
+      return 'Sua vez: escolha Bater, Ficar ou reinicie a rodada'
     }
 
     if (phase === 'dealer-turn') {
@@ -107,7 +107,7 @@ function BlackjackGame() {
             onClick={handleHit}
             disabled={gameBusy || phase !== 'player-turn'}
           >
-            Hit
+            Bater
           </Button>
 
           <Button
@@ -115,7 +115,7 @@ function BlackjackGame() {
             onClick={handleStand}
             disabled={gameBusy || phase !== 'player-turn'}
           >
-            Stand
+            Ficar
           </Button>
 
           <Button
